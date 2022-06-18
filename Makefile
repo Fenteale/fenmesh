@@ -6,7 +6,11 @@ LDFLAGS =
 .PHONY: all
 all: fenmesh-client
 
-fenmesh-client: main.c
+.PHONY: all-debug
+all-debug: override CFLAGS += -Wall -g
+all-debug: all
+
+fenmesh-client: main.c readconfig.c
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 .PHONY: clean

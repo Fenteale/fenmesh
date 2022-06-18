@@ -10,10 +10,22 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
+#include "readconfig.h"
+
 #define PORTNUM     6017
-#define SERVER_IP   "127.0.0.1" //server is running on same computer
+//#define SERVER_IP   "127.0.0.1" //server is running on same computer
 
 int main() {
+    if (parseConfig("fenmesh.conf"))
+        fprintf(stderr, "%s\n", getParseError());
+
+    const char* host_ipVal = getConfigValue("host_ip");
+    if (host_ipVal==NULL) {
+        fprintf(stderr, "%s\n", getParseError());
+        return -1;
+    }
+    else
+        printf("Host_ip value: %s\n", host_ipVal);
     // initialize our variables
     int socket_d;
     struct sockaddr_in server_a;
@@ -25,7 +37,7 @@ int main() {
         exit(1);
     }
 
-    server_a.sin_addr.s_addr = inet_addr(SERVER_IP); // set server's ip (in this case, the same PC)
+    server_a.sin_addr.s_addr = inet_addr(host_ipVal); // set server's ip (in this case, the same PC)
     server_a.sin_family = AF_INET; 
     server_a.sin_port = htons(PORTNUM); //set port number
 
@@ -33,7 +45,7 @@ int main() {
         fprintf(stderr, "Connection failed.\n");
         exit(1);
     }
-    printf("Connected to " SERVER_IP "\n"); // success!
+    printf("Connected to %s\n", host_ipVal); // success!
 
     if( recv(socket_d, read_buffer, 512, 0) < 0) { //try to recieve a message thats 512 bytes long and store it in read_buffer
         fprintf(stderr, "Error reading from server.\n");
