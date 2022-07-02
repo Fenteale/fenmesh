@@ -7,54 +7,91 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <signal.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 
-#include "readconfig.h"
+#include "log.h"
+#include "client.h"
+#include "server.h"
 
 #define PORTNUM     6017
-//#define SERVER_IP   "127.0.0.1" //server is running on same computer
 
-int main() {
-    if (parseConfig("fenmesh.conf"))
-        fprintf(stderr, "%s\n", getParseError());
+static void daemonize() {
+    pid_t pid;
 
-    const char* host_ipVal = getConfigValue("host_ip");
-    if (host_ipVal==NULL) {
-        fprintf(stderr, "%s\n", getParseError());
-        return -1;
+    pid = fork();
+
+    if (pid < 0) {
+        printf("Daemonization failed!\n");
+        exit(EXIT_FAILURE);
     }
-    else
-        printf("Host_ip value: %s\n", host_ipVal);
-    // initialize our variables
-    int socket_d;
-    struct sockaddr_in server_a;
-    char read_buffer[512];
-
-    socket_d = socket(AF_INET, SOCK_STREAM, 0); // open a socket
-    if (socket_d < 0) {
-        fprintf(stderr, "Could not open socket: %s\n", strerror(errno));
-        exit(1);
-    }
-
-    server_a.sin_addr.s_addr = inet_addr(host_ipVal); // set server's ip (in this case, the same PC)
-    server_a.sin_family = AF_INET; 
-    server_a.sin_port = htons(PORTNUM); //set port number
-
-    if (connect(socket_d, (struct sockaddr *)&server_a, sizeof(server_a)) < 0) { //try to connect to server
-        fprintf(stderr, "Connection failed.\n");
-        exit(1);
-    }
-    printf("Connected to %s\n", host_ipVal); // success!
-
-    if( recv(socket_d, read_buffer, 512, 0) < 0) { //try to recieve a message thats 512 bytes long and store it in read_buffer
-        fprintf(stderr, "Error reading from server.\n");
-        exit(1);
-    }
-
-    printf("%s\n", read_buffer); //print out message recieved to terminal
     
-    close(socket_d);
+    if (pid > 0)
+        exit(EXIT_SUCCESS);
 
-    return 0;
+    if (setsid() < 0)
+        exit(EXIT_FAILURE);
+    
+    signal(SIGCHLD, SIG_IGN);
+    signal(SIGHUP, SIG_IGN);
+
+    pid = fork();
+
+    if (pid < 0)
+        exit(EXIT_FAILURE);
+    
+    if (pid > 0)
+        exit(EXIT_SUCCESS);
+
+    umask(0);
+
+    chdir("/");
+
+    int x;
+    for(x = sysconf(_SC_OPEN_MAX); x>=0; x--)
+        close(x);
+
+}
+
+
+int main(int argc, char *argv[]) {
+    int option;
+    int toDaemonize = 0;
+    int clientOrServer = 0; //0 for server, 1 for client
+    while((option = getopt(argc, argv, "dc")) != -1){
+        switch(option) {
+            case 'd':
+                printf("Launching as Daemon.\n");
+                toDaemonize = 1;
+                break;
+            case 'c':
+                printf("Launching as client");
+                clientOrServer = 1;
+            default:
+                printf("Unknown option %c\n", option);
+                break;
+        }
+    }
+    if(toDaemonize) {
+        openLog(1);
+        daemonize();
+    }
+    else {
+        openLog(0);
+    }
+
+    if(clientOrServer)
+        setupClient();
+    else
+        setupServer();
+
+    
+    logWrite("Fenmesh-server shutting down.");
+    closeLog();
+    
+
+    return EXIT_SUCCESS;
 }

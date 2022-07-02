@@ -4,15 +4,15 @@ obj = $(src:.c=.o)
 LDFLAGS =
 
 .PHONY: all
-all: fenmesh-client
+all: fenmesh
 
 .PHONY: all-debug
 all-debug: override CFLAGS += -Wall -g
 all-debug: all
 
-fenmesh-client: main.c readconfig.c
+fenmesh: main.c readconfig.c client.c server.c log.c
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 .PHONY: clean
 clean:
-	rm -f $(obj) fenmesh-client
+	rm -f $(obj) fenmesh
