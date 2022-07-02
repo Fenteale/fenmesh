@@ -68,8 +68,9 @@ int main(int argc, char *argv[]) {
                 toDaemonize = 1;
                 break;
             case 'c':
-                printf("Launching as client");
+                printf("Launching as client.\n");
                 clientOrServer = 1;
+                break;
             default:
                 printf("Unknown option %c\n", option);
                 break;

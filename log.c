@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-static FILE* logFile;
+static FILE* logFile = NULL;
 static int onlyLog = 0;
 
 void openLog(int logOnly) {
@@ -30,6 +30,7 @@ void logWrite(const char * msg, ...) {
         va_end(args);
         fprintf(logFile, "\n");
         fclose(logFile);
+        logFile = NULL;
         if(!onlyLog) {
             printf("[%s] ", curtime);
             va_start(args, msg);
