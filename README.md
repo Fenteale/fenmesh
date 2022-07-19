@@ -5,7 +5,7 @@ Although Fenmesh is not ready for use, some basic features have already been imp
 
 ### First edit config file
 
-The file `fenmesh.conf` holds all configuration options for the program. In order to have the client connect to the master server the host ip must be supplied. An example `fenmesh.conf` is in the repo which used the IP `127.0.0.1` as the master server IP.
+The file `fenmesh.conf` holds all configuration options for the program. In order to have the client connect to the master server the host ip must be supplied as `host_ip`. Also, it's a good idea to set where the log file is put by specifying `log_path` in the config file. An example `fenmesh.conf` is in the repo which uses the IP `127.0.0.1` as the master server IP.
 
 ### Start the Masterserver
 

@@ -16,6 +16,7 @@
 #include "log.h"
 #include "client.h"
 #include "server.h"
+#include "readconfig.h"
 
 #define PORTNUM     6017
 
@@ -76,12 +77,24 @@ int main(int argc, char *argv[]) {
                 break;
         }
     }
+
+    if (parseConfig("fenmesh.conf"))
+        printf("%s", getParseError());
+
+    const char* log_path = getConfigValue("log_path");
+    if (log_path==NULL) {
+        printf("%s", getParseError());
+        exit(1);
+    }
+    else
+        printf("Log path value: %s\n", log_path);
+
     if(toDaemonize) {
-        openLog(1);
+        openLog(log_path, 1);
         daemonize();
     }
     else {
-        openLog(0);
+        openLog(log_path, 0);
     }
 
     if(clientOrServer)

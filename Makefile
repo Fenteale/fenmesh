@@ -10,7 +10,7 @@ all: fenmesh
 all-debug: override CFLAGS += -Wall -g
 all-debug: all
 
-fenmesh: main.c readconfig.c client.c server.c log.c
+fenmesh: $(src)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 .PHONY: clean

@@ -6,18 +6,20 @@
 
 static FILE* logFile = NULL;
 static int onlyLog = 0;
+static const char* logPath = NULL;
 
-void openLog(int logOnly) {
+void openLog(const char* path, int logOnly) {
     onlyLog = logOnly;
+    logPath = path;
     if (logFile)
         fclose(logFile);
     
-    logFile = fopen(TEMP_LOG_NAME, "w");
+    logFile = fopen(logPath, "w");
     if (logFile)
         fclose(logFile);
 }
 void logWrite(const char * msg, ...) {
-    logFile = fopen(TEMP_LOG_NAME, "a");
+    logFile = fopen(logPath, "a");
     if(logFile) {
         time_t tm;
         time(&tm);
