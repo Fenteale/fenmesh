@@ -17,46 +17,9 @@
 #include "client.h"
 #include "server.h"
 #include "readconfig.h"
+#include "daemon.h"
 
 #define PORTNUM     6017
-
-static void daemonize() {
-    pid_t pid;
-
-    pid = fork();
-
-    if (pid < 0) {
-        printf("Daemonization failed!\n");
-        exit(EXIT_FAILURE);
-    }
-    
-    if (pid > 0)
-        exit(EXIT_SUCCESS);
-
-    if (setsid() < 0)
-        exit(EXIT_FAILURE);
-    
-    signal(SIGCHLD, SIG_IGN);
-    signal(SIGHUP, SIG_IGN);
-
-    pid = fork();
-
-    if (pid < 0)
-        exit(EXIT_FAILURE);
-    
-    if (pid > 0)
-        exit(EXIT_SUCCESS);
-
-    umask(0);
-
-    chdir("/");
-
-    int x;
-    for(x = sysconf(_SC_OPEN_MAX); x>=0; x--)
-        close(x);
-
-}
-
 
 int main(int argc, char *argv[]) {
     int option;
@@ -91,6 +54,7 @@ int main(int argc, char *argv[]) {
 
     if(toDaemonize) {
         openLog(log_path, 1);
+        start_daemon_socket();
         daemonize();
     }
     else {

@@ -3,4 +3,6 @@
 
 #define PRINT_CONFIG_ERR
 
+#define DAEMON_SOCKET_NAME  "/tmp/fenmesh.sock"
+
 #endif
