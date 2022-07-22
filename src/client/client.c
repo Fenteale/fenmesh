@@ -7,8 +7,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-#include "readconfig.h"
-#include "log.h"
+#include "config/readconfig.h"
+#include "log/log.h"
 
 #define PORTNUM     6017 //temp
 

@@ -24,9 +24,6 @@ void setupServer() {
     if (setsockopt(socket_d, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0) {
         logWrite("Error configuring socket: %s", strerror(errno));
     }
-    /*if (setsockopt(socket_d, SOL_SOCKET, SO_REUSEPORT, &(int){1}, sizeof(int)) < 0) {
-        fprintf(stderr, "Error configuring socket: %s\n", strerror(errno));
-    }*/
     
     struct sockaddr_in server_a, client_a;
     server_a.sin_family = AF_INET; // no idea tbh, dont touch this
